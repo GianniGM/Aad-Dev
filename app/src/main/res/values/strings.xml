@@ -23,4 +23,7 @@
     <string name="pref_sortBy_due" translatable="false">due</string>
     <string name="tast_added">Task added</string>
     <string name="date_not_set">Due date not set</string>
+    <string name="remove_dialog">Remove task, are you sure?</string>
+    <string name="yes">yes</string>
+    <string name="delete_title">Delete?</string>
 </resources>

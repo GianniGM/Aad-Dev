@@ -2,6 +2,7 @@ package com.google.developer.taskmaker;
 
 import android.app.LoaderManager;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -37,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final int ADD_ITEM_REQUEST = 666;
     private static final int LOADER = 0;
-    private static final int DETAIL_ITEM_REQUEST = 555;
     private TaskAdapter mAdapter;
     private FloatingActionButton mFab;
     private RecyclerView recyclerView;
@@ -89,10 +89,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
 
-            case DETAIL_ITEM_REQUEST:
-
-                break;
-
             //todo
 //        getLoaderManager().restartLoader(LOADER,null, this);
 //        super.onActivityResult(requestCode, resultCode, data);
@@ -132,6 +128,16 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onItemToggled(boolean active, int position) {
         //TODO: Handle task item checkbox event
+        final Task task = mAdapter.getItem(position);
+
+        final boolean isComplete = !task.isComplete;
+
+        final ContentValues values = new ContentValues(1);
+        values.put(DatabaseContract.TaskColumns.IS_COMPLETE, isComplete);
+
+        final Uri uri = ContentUris.withAppendedId(DatabaseContract.CONTENT_URI, task.id);
+        TaskUpdateService.updateTask(this, uri, values);
+        getLoaderManager().restartLoader(LOADER,null, this);
     }
 
     @Override

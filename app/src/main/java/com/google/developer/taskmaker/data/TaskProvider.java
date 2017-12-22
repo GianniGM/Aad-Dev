@@ -185,7 +185,7 @@ public class TaskProvider extends ContentProvider {
                 .getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
         //Run the job approximately every hour
-        long jobInterval = 900000L;
+        long jobInterval = 3600*1000;
 
         ComponentName jobService = new ComponentName(getContext(), CleanupJobService.class);
         JobInfo task = new JobInfo.Builder(CLEANUP_JOB_ID, jobService)
