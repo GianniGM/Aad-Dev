@@ -39,8 +39,6 @@ public class MainActivity extends AppCompatActivity implements
     private static final int ADD_ITEM_REQUEST = 666;
     private static final int LOADER = 0;
     private TaskAdapter mAdapter;
-    private FloatingActionButton mFab;
-    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +47,13 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(this);
 
         mAdapter = new TaskAdapter(null);
         mAdapter.setOnItemClickListener(this);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -88,10 +86,6 @@ public class MainActivity extends AppCompatActivity implements
                 checkInserted(resultCode);
                 break;
             }
-
-            //todo
-//        getLoaderManager().restartLoader(LOADER,null, this);
-//        super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -128,24 +122,27 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onItemToggled(boolean active, int position) {
         //TODO: Handle task item checkbox event
-        final Task task = mAdapter.getItem(position);
+        Task task = mAdapter.getItem(position);
+        boolean isComplete = !task.isComplete;
 
-        final boolean isComplete = !task.isComplete;
-
-        final ContentValues values = new ContentValues(1);
+        ContentValues values = new ContentValues(1);
         values.put(DatabaseContract.TaskColumns.IS_COMPLETE, isComplete);
 
-        final Uri uri = ContentUris.withAppendedId(DatabaseContract.CONTENT_URI, task.id);
+        Uri uri = ContentUris.withAppendedId(DatabaseContract.CONTENT_URI, task.id);
         TaskUpdateService.updateTask(this, uri, values);
         getLoaderManager().restartLoader(LOADER,null, this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        final String defaultSort = super.getString(R.string.pref_sortBy_default);
-        final String sort = prefs.getString(super.getString(R.string.pref_sortBy_key), defaultSort);
-        final String sortOrder = sort.equals(defaultSort) ? DatabaseContract.DEFAULT_SORT : DatabaseContract.DATE_SORT;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String sortByDefault = getString(R.string.pref_sortBy_default);
+
+        String sortByKey = prefs.getString(getString(R.string.pref_sortBy_key), sortByDefault);
+
+        String sortOrder = sortByKey.compareTo(sortByDefault) == 0
+                ? DatabaseContract.DEFAULT_SORT
+                : DatabaseContract.DATE_SORT;
 
         CursorLoader cursorLoader = new CursorLoader(
                 this,
@@ -155,13 +152,11 @@ public class MainActivity extends AppCompatActivity implements
                 null,
                 sortOrder
         );
-
         return cursorLoader;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-
         mAdapter.swapCursor(cursor);
         if(cursor != null)
              cursor.getCount();

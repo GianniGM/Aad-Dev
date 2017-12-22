@@ -23,11 +23,7 @@ import java.util.Calendar;
 public class TaskDetailActivity extends AppCompatActivity implements
         DatePickerDialog.OnDateSetListener {
 
-    private TextView textName;
-    private TextView textDate;
-    private ImageView preference;
     private DatePickerDialog datePickerDialog = null;
-
     private Uri taskUri;
 
     @Override
@@ -37,9 +33,10 @@ public class TaskDetailActivity extends AppCompatActivity implements
 
         //Task must be passed to this activity as a valid provider Uri
         taskUri = getIntent().getData();
-        textName = (TextView) findViewById(R.id.text_name);
-        textDate = (TextView) findViewById(R.id.text_due_date);
-        preference = (ImageView) findViewById(R.id.priority);
+
+        TextView textName = (TextView) findViewById(R.id.text_name);
+        TextView textDate = (TextView) findViewById(R.id.text_due_date);
+        ImageView preference = (ImageView) findViewById(R.id.priority);
 
         //TODO: Display attributes of the provided task in the UI
         Cursor cursor = getContentResolver().query(
@@ -80,8 +77,9 @@ public class TaskDetailActivity extends AppCompatActivity implements
                             calendar.get(Calendar.MONTH),
                             calendar.get(Calendar.DAY_OF_MONTH)
                     );
-                    // https://stackoverflow.com/a/23762355/3072570
-                    datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                    datePickerDialog.getDatePicker().setMinDate(
+                            System.currentTimeMillis() - 1000
+                    );
                 }
 
                 if (!datePickerDialog.isShowing()) {
@@ -116,23 +114,17 @@ public class TaskDetailActivity extends AppCompatActivity implements
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
         //TODO: Handle date selection from a DatePickerFragment
-        final long pickerTime = getMillisTime(day, month, year);
-        AlarmScheduler.scheduleAlarm(this, pickerTime, taskUri);
-        finish();
-    }
-
-    private long getMillisTime(int dd, int mm, int yyyy) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, yyyy);
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
         calendar.set(Calendar.HOUR_OF_DAY, 12);
-
-        calendar.set(Calendar.MONTH, mm);
-        calendar.set(Calendar.DAY_OF_MONTH, dd);
-
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
-        return calendar.getTimeInMillis();
+        final long pickerTime = calendar.getTimeInMillis();
+        AlarmScheduler.scheduleAlarm(this, pickerTime, taskUri);
+        finish();
     }
 }
