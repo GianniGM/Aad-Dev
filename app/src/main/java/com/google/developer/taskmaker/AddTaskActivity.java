@@ -20,6 +20,8 @@ import com.google.developer.taskmaker.views.DatePickerFragment;
 
 import java.util.Calendar;
 
+import static com.google.developer.taskmaker.MainActivity.INSERTED_RESULT;
+
 public class AddTaskActivity extends AppCompatActivity implements
         DatePickerDialog.OnDateSetListener,
         View.OnClickListener {
@@ -114,6 +116,7 @@ public class AddTaskActivity extends AppCompatActivity implements
         values.put(TaskColumns.DUE_DATE, getDateSelection());
 
         TaskUpdateService.insertNewTask(this, values);
+        setResult(MainActivity.INSERTED_RESULT);
         finish();
     }
 

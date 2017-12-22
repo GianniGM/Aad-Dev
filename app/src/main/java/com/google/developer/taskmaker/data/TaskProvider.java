@@ -57,7 +57,44 @@ public class TaskProvider extends ContentProvider {
         //TODO: Implement task query
         //TODO: Expected "query all" Uri: content://com.google.developer.taskmaker/tasks
         //TODO: Expected "query one" Uri: content://com.google.developer.taskmaker/tasks/{id}
-        return null;
+        final SQLiteDatabase dataBase = mDbHelper.getReadableDatabase();
+        Cursor cursor = null;
+
+        switch (sUriMatcher.match(uri)){
+            case TASKS_WITH_ID:
+                Long id = ContentUris.parseId(uri);
+
+                cursor = dataBase.query(
+                        DatabaseContract.TABLE_TASKS,
+                        projection,
+                        DatabaseContract.TaskColumns._ID + " = ?",
+                        new String[]{id.toString()},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case TASKS:
+                cursor = dataBase.query(
+                        DatabaseContract.TABLE_TASKS,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            default:
+                throw new UnsupportedOperationException("Wrong Uri:" + uri);
+
+        }
+
+        if (getContext() != null) {
+            cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        }
+
+        return cursor;
     }
 
     @Nullable
@@ -65,14 +102,51 @@ public class TaskProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         //TODO: Implement new task insert
         //TODO: Expected Uri: content://com.google.developer.taskmaker/tasks
-        return null;
+        final SQLiteDatabase dataBase = mDbHelper.getReadableDatabase();
+        Uri newUri;
+        switch (sUriMatcher.match(uri)) {
+            case TASKS:
+                dataBase.insert(DatabaseContract.TABLE_TASKS, null, values);
+                newUri = DatabaseContract.CONTENT_URI;
+                break;
+            default:
+                throw new UnsupportedOperationException("Wrong Uri:" + uri);
+        }
+
+        final Context context = getContext();
+        if (context != null) {
+            context.getContentResolver().notifyChange(uri, null);
+        }
+
+        return newUri;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         //TODO: Implement existing task update
         //TODO: Expected Uri: content://com.google.developer.taskmaker/tasks/{id}
-        return 0;
+        final SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        int rows = 0;
+
+        switch (sUriMatcher.match(uri)) {
+            case TASKS_WITH_ID:
+                final Long id = ContentUris.parseId(uri);
+
+                rows = db.update(
+                        DatabaseContract.TABLE_TASKS,
+                        values,
+                        DatabaseContract.TaskColumns._ID + " = ?",
+                        new String[]{id.toString()}
+                );
+                break;
+            default:
+                throw new UnsupportedOperationException("Wrong Uri:" + uri);
+        }
+
+        if (getContext() != null) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rows;
     }
 
     @Override

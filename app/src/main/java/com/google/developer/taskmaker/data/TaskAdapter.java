@@ -87,9 +87,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskHolder> {
 
     @Override
     public void onBindViewHolder(TaskHolder holder, int position) {
-
+        final Task task = getItem(position);
         //TODO: Bind the task data to the views
-
+        holder.checkBox.setChecked(task.isComplete);
+        holder.nameView.setText(task.description);
     }
 
     @Override
