@@ -74,6 +74,7 @@ public class TaskProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
+
             case TASKS:
                 cursor = dataBase.query(
                         DatabaseContract.TABLE_TASKS,

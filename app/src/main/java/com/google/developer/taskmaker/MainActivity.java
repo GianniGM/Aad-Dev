@@ -1,6 +1,7 @@
 package com.google.developer.taskmaker;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.developer.taskmaker.data.DatabaseContract;
+import com.google.developer.taskmaker.data.Task;
 import com.google.developer.taskmaker.data.TaskAdapter;
 import com.google.developer.taskmaker.data.TaskUpdateService;
 
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final int ADD_ITEM_REQUEST = 666;
     private static final int LOADER = 0;
+    private static final int DETAIL_ITEM_REQUEST = 555;
     private TaskAdapter mAdapter;
     private FloatingActionButton mFab;
     private RecyclerView recyclerView;
@@ -80,23 +83,33 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == ADD_ITEM_REQUEST){
-            String message;
-
-            switch (resultCode){
-                case INSERTED_RESULT:
-                    message = getString(R.string.tast_added);
-                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                    break;
-
-                default:
-                    break;
+        switch (requestCode) {
+            case ADD_ITEM_REQUEST: {
+                checkInserted(resultCode);
+                break;
             }
-        }
 
-        //todo
-        getLoaderManager().restartLoader(LOADER,null, this);
+            case DETAIL_ITEM_REQUEST:
+
+                break;
+
+            //todo
+//        getLoaderManager().restartLoader(LOADER,null, this);
 //        super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void checkInserted(int resultCode) {
+        String message;
+        switch (resultCode) {
+            case INSERTED_RESULT:
+                message = getString(R.string.tast_added);
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                break;
+
+            default:
+                break;
+        }
     }
 
     /* Click events in Floating Action Button */
@@ -109,7 +122,10 @@ public class MainActivity extends AppCompatActivity implements
     /* Click events in RecyclerView items */
     @Override
     public void onItemClick(View v, int position) {
-        //TODO: Handle list item click event
+        Task taskClicked = mAdapter.getItem(position);
+        final Intent intent = new Intent(this, TaskDetailActivity.class);
+        intent.setData(ContentUris.withAppendedId(DatabaseContract.CONTENT_URI, taskClicked.id));
+        startActivity(intent);
     }
 
     /* Click events on RecyclerView item checkboxes */
