@@ -2,6 +2,7 @@ package com.google.developer.taskmaker;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements
         View.OnClickListener {
 
     private TaskAdapter mAdapter;
+    private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(this);
+        
         mAdapter = new TaskAdapter(null);
         mAdapter.setOnItemClickListener(this);
 
