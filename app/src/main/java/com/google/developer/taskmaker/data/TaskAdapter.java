@@ -88,9 +88,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskHolder> {
     @Override
     public void onBindViewHolder(TaskHolder holder, int position) {
         final Task task = getItem(position);
+
         //TODO: Bind the task data to the views
         holder.checkBox.setChecked(task.isComplete);
         holder.nameView.setText(task.description);
+        holder.priorityView.setImageResource(R.drawable.ic_not_priority);
+
+        if(task.hasDueDate()){
+            holder.dateView.setText(DateUtils.getRelativeTimeSpanString(task.dueDateMillis));
+            holder.dateView.setVisibility(View.VISIBLE);
+        }else{
+            holder.dateView.setVisibility(View.GONE);
+        }
+
+        if(task.isPriority)
+            holder.priorityView.setImageResource(R.drawable.ic_priority);
     }
 
     @Override
